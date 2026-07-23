@@ -14,13 +14,20 @@ namespace SimpleCarDb.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
-        public DbSet<Models.Brand> Brands => Set<Models.Brand>();
-        public DbSet<Models.Car> Cars { get; set; }
+        //táblák:
+        public DbSet<Brand> Brands => Set<Brand>();
+        public DbSet<Car> Cars { get; set; }
+        public DbSet<EngineDetail> EngineDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Car>() //enginedetail osztály utólagos hozzáadása és a kapcsolatok meghatározása
+                .HasOne(c => c.EngineDetail)
+                .WithOne(e => e.Car)
+                .HasForeignKey<EngineDetail>(e => e.CarId);
+
             //dummy data :)
             modelBuilder.Entity<Brand>().HasData(
                 new Brand { Id = 1, Name = "BMW" },
@@ -43,6 +50,8 @@ namespace SimpleCarDb.Data
                 new Car { Id = 9, Name = "EQE", Type = "Elektromos (BEV)", BrandId = 5 },
                 new Car { Id = 10, Name = "C220", Type = "Mild Hibrid (MHEV)", BrandId = 5 }
             );
+
+            
         }
     }
 }

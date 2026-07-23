@@ -17,5 +17,6 @@ namespace SimpleCarDb.Models
 
         [JsonIgnore] //megint elfelejtettem...
         public Brand? Brand { get; set; }
+        public EngineDetail? EngineDetail { get; set; }
     }
 }

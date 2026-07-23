@@ -21,7 +21,7 @@ namespace SimpleCarDb.Controllers
         [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
-            var cars = await _context.Cars.ToListAsync();
+            var cars = await _context.Cars.Include(c => c.EngineDetail).ToListAsync();
             return Ok(cars);
         }
 
@@ -33,6 +33,24 @@ namespace SimpleCarDb.Controllers
             var cars = await _context.Cars.Where(c => c.Brand.Name.ToLower() == brand.ToLower())
                 .ToListAsync();
             return cars == null ? NotFound() : Ok(cars);
+        }
+
+        [HttpGet("id nélkül")]
+        [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllWithoutIds()
+        {
+            var carDetails = await _context.Cars
+                .Select(c => new
+                {
+                    Márka = c.Brand.Name,
+                    Név = c.Name,
+                    Típus = c.Type,
+                    Motorszám = c.EngineDetail != null ? c.EngineDetail.EngineNumber : "Nincs adat",
+                    Köbcenti = c.EngineDetail != null ? c.EngineDetail.CapacityCc : 0,
+                    Lóerő = c.EngineDetail != null ? c.EngineDetail.Horsepower : 0
+                })
+                .ToListAsync();
+            return Ok(carDetails);
         }
 
         [HttpGet("{id:int}")]
@@ -94,6 +112,26 @@ namespace SimpleCarDb.Controllers
             await _context.Cars.AddAsync(car);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { id = car.Id }, car);
+        }
+
+        [HttpPut("{carId:int}/connect-engine/{engineId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ConnectEngineToCar([FromRoute] int carId, [FromRoute] int engineId)
+        {
+            var engine = await _context.EngineDetails.FindAsync(engineId);
+            if (engine == null)
+            {
+                return NotFound("A megadott motor nem található.");
+            }
+            var carExists = await _context.Cars.AnyAsync(c => c.Id == carId);
+            if (!carExists)
+            {
+                return NotFound("A megadott autó nem található.");
+            }
+            engine.CarId = carId;
+            await _context.SaveChangesAsync();
+            return Ok(new { message = $"A {engineId} motor sikeresen összekötve a {carId} autóval." });
         }
 
     }

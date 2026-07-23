@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleCarDb.Data;
 
@@ -10,9 +11,11 @@ using SimpleCarDb.Data;
 namespace SimpleCarDb.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260723113311_MakeCarIdNullable2")]
+    partial class MakeCarIdNullable2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,7 +177,7 @@ namespace SimpleCarDb.Migrations
                     b.Property<int>("CapacityCc")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CarId")
+                    b.Property<int>("CarId")
                         .HasColumnType("int");
 
                     b.Property<string>("EngineNumber")
@@ -187,10 +190,91 @@ namespace SimpleCarDb.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CarId")
-                        .IsUnique()
-                        .HasFilter("[CarId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("EngineDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CapacityCc = 1995,
+                            CarId = 1,
+                            EngineNumber = "B47D20A123456",
+                            Horsepower = 190
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CapacityCc = 2993,
+                            CarId = 2,
+                            EngineNumber = "S58B30A654321",
+                            Horsepower = 510
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CapacityCc = 1798,
+                            CarId = 3,
+                            EngineNumber = "2ZRFXE987654",
+                            Horsepower = 122
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CapacityCc = 2487,
+                            CarId = 4,
+                            EngineNumber = "A25AFXS456789",
+                            Horsepower = 306
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CapacityCc = 5038,
+                            CarId = 5,
+                            EngineNumber = "COY50V8112233",
+                            Horsepower = 450
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CapacityCc = 3496,
+                            CarId = 6,
+                            EngineNumber = "ECO35V6998877",
+                            Horsepower = 400
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CapacityCc = 1968,
+                            CarId = 7,
+                            EngineNumber = "DEUA20TDI3344",
+                            Horsepower = 204
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CapacityCc = 3996,
+                            CarId = 8,
+                            EngineNumber = "DBCV40TFSI667",
+                            Horsepower = 600
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CapacityCc = 0,
+                            CarId = 9,
+                            EngineNumber = "EM0004ELEC112",
+                            Horsepower = 292
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CapacityCc = 1993,
+                            CarId = 10,
+                            EngineNumber = "OM65420D99001",
+                            Horsepower = 200
+                        });
                 });
 
             modelBuilder.Entity("SimpleCarDb.Models.Car", b =>
@@ -208,7 +292,9 @@ namespace SimpleCarDb.Migrations
                 {
                     b.HasOne("SimpleCarDb.Models.Car", "Car")
                         .WithOne("EngineDetail")
-                        .HasForeignKey("SimpleCarDb.Models.EngineDetail", "CarId");
+                        .HasForeignKey("SimpleCarDb.Models.EngineDetail", "CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Car");
                 });

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleCarDb.Data;
 
@@ -10,9 +11,11 @@ using SimpleCarDb.Data;
 namespace SimpleCarDb.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260723085610_AddEngineDetail")]
+    partial class AddEngineDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,7 +177,7 @@ namespace SimpleCarDb.Migrations
                     b.Property<int>("CapacityCc")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CarId")
+                    b.Property<int>("CarId")
                         .HasColumnType("int");
 
                     b.Property<string>("EngineNumber")
@@ -187,8 +190,7 @@ namespace SimpleCarDb.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CarId")
-                        .IsUnique()
-                        .HasFilter("[CarId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("EngineDetails");
                 });
@@ -208,7 +210,9 @@ namespace SimpleCarDb.Migrations
                 {
                     b.HasOne("SimpleCarDb.Models.Car", "Car")
                         .WithOne("EngineDetail")
-                        .HasForeignKey("SimpleCarDb.Models.EngineDetail", "CarId");
+                        .HasForeignKey("SimpleCarDb.Models.EngineDetail", "CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Car");
                 });
