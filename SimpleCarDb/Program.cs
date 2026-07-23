@@ -7,11 +7,12 @@ using SimpleCarDb.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//ide jön az slő kommentelt rész
+//ide jön az eslő kommentelt rész
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
+
 //swagger szűrő a megjelenítéshez:
 builder.Services.AddSwaggerGen(c =>
 {
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+//swagger beállítások:
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -48,4 +50,13 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
+*/
+
+//adatbázis frissítés: --var app = builder.Build();-- sor után kell berakni
+/*
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 */

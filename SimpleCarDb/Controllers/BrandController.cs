@@ -62,7 +62,7 @@ namespace SimpleCarDb.Controllers
         {
             if (id != updatedBrand.Id)
             {
-                return BadRequest("Az URL-ben szereplő ID nem egyezik a küldött objektum ID-jával.");
+                return BadRequest("Az ID nem egyezik a küldött objektum ID-jával.");
             }
             var existingBrand = await _context.Brands.FindAsync(id);
             if (existingBrand == null)
