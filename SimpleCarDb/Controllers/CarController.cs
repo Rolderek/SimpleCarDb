@@ -152,7 +152,7 @@ namespace SimpleCarDb.Controllers
 
 
         /*
-        //hibás endpointjaim
+        //hibás endpointok
         [HttpGet("carsFromThisBrand/{brand}")]
         [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
