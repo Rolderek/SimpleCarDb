@@ -6,13 +6,13 @@ using SimpleCarDb.Models;
 namespace SimpleCarDb.Controllers
 {
 
-    [ApiController]
-    [Route("[controller]")]
+    [ApiController] //Automatikus Validáció, Intelligens Adatfelismerés(json) nem feltétlenül kell neki a FromBody/FromRoute, Kötelező Routolás, minden metódusnak legyen útvonala 
+    [Route("[controller]")] //lehetne [Route("api/[controller]")] ez is, a megjelenő cím "localhost:5000/Car"
     public class CarController : Controller
     {
-        private readonly Data.AppDbContext _context;
+        private readonly AppDbContext _context;
 
-        public CarController(Data.AppDbContext context)
+        public CarController(AppDbContext context)
         {
             _context = context;
         }
@@ -24,17 +24,36 @@ namespace SimpleCarDb.Controllers
             var cars = await _context.Cars.Include(c => c.EngineDetail).ToListAsync();
             return Ok(cars);
         }
-
-        [HttpGet("{brand}")]
+        [HttpGet("brand/{brand}")]
         [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetCarsFromOneBand([FromRoute] string brand)
+        public async Task<IActionResult> GetCarsFromOneBrand([FromRoute] string brand)
         {
-            var cars = await _context.Cars.Where(c => c.Brand.Name.ToLower() == brand.ToLower())
+            var cars = await _context.Cars
+                .Where(c => c.Brand.Name.ToLower() == brand.ToLower())
                 .ToListAsync();
-            return cars == null ? NotFound() : Ok(cars);
+            if (cars.Count == 0)
+            {
+                return NotFound($"Nem találtunk egyetlen autót sem a(z) {brand} márkától.");
+            }
+            return Ok(cars);
         }
 
+        [HttpGet("except-brand/{brand}")]
+        [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAllCarsExceptFromThisBrand([FromRoute] string brand)
+        {
+            var cars = await _context.Cars
+                .Where(c => c.Brand.Name.ToLower() != brand.ToLower())
+                .ToListAsync();
+            if (cars.Count == 0)
+            {
+                return NotFound($"Nem találtunk más márkájú autót a(z) {brand} kivételével.");
+            }
+            return Ok(cars);
+        }
+        
         [HttpGet("id nélkül")]
         [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllWithoutIds()
@@ -46,7 +65,7 @@ namespace SimpleCarDb.Controllers
                     Név = c.Name,
                     Típus = c.Type,
                     Motorszám = c.EngineDetail != null ? c.EngineDetail.EngineNumber : "Nincs adat",
-                    Köbcenti = c.EngineDetail != null ? c.EngineDetail.CapacityCc : 0,
+                    Köbcenti = c.EngineDetail == null ? 0: c.EngineDetail.CapacityCc,
                     Lóerő = c.EngineDetail != null ? c.EngineDetail.Horsepower : 0
                 })
                 .ToListAsync();
@@ -72,14 +91,11 @@ namespace SimpleCarDb.Controllers
             {
                 return NotFound();
             }
-            else
-            {
-                existingCar.Name = carToUpdate.Name;
-                existingCar.Type = carToUpdate.Type;
-                existingCar.BrandId = carToUpdate.BrandId;
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
+            existingCar.Name = carToUpdate.Name;
+            existingCar.Type = carToUpdate.Type;
+            existingCar.BrandId = carToUpdate.BrandId;
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
@@ -134,5 +150,27 @@ namespace SimpleCarDb.Controllers
             return Ok(new { message = $"A {engineId} motor sikeresen összekötve a {carId} autóval." });
         }
 
+
+        /*
+        //hibás endpointjaim
+        [HttpGet("carsFromThisBrand/{brand}")]
+        [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCarsFromOneBand([FromRoute] string brand)
+        {
+            var cars = await _context.Cars.Where(c => c.Brand.Name.ToLower() == brand.ToLower())
+                .ToListAsync();
+            return cars.Any() ? NotFound() : Ok(cars);
+        }
+
+        [HttpGet("carsButNotThisBrand/{brand}")]
+        [ProducesResponseType(typeof(List<Car>), StatusCodes.Status200OK)]
+        [ProducesResponseType( StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAllCarsExceptFromThisBrand([FromRoute] string brand)
+        {
+            var cars = await _context.Cars.Where(c => c.Brand.Name.ToLower() != brand.ToLower()).ToListAsync();
+            return cars.Any() ? NotFound() : Ok(cars); 
+        }
+        */
     }
 }

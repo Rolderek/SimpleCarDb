@@ -62,7 +62,17 @@ namespace SimpleCarDb.Controllers
             }
             await _context.EngineDetails.AddAsync(engine);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new {id=engine.Id}, engine);
+            return CreatedAtAction(nameof(Get), new { id = engine.Id }, engine);
+        }
+
+        [HttpGet("min-horsepower/{p:int}")]
+        [ProducesResponseType(typeof(List<EngineDetail>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetHigherHorser([FromRoute] int p)
+        {
+            var engines = await _context.EngineDetails.FromSql(
+                $"SELECT * FROM EngineDetails WHERE Horsepower >= {p}")
+                .ToListAsync();
+            return Ok(engines);
         }
     }
 }

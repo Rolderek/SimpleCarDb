@@ -11,8 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddEndpointsApiExplorer();
-
 //swagger szűrő a megjelenítéshez:
 builder.Services.AddSwaggerGen(c =>
 {
