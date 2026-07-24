@@ -95,7 +95,15 @@ namespace SimpleCarDb.Controllers
             }
         }
 
-        
+        [HttpGet("brandName")]
+        [ProducesResponseType(typeof(List<Brand>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetName()
+        {
+            var brands = await _context.Brands
+                .Select(brand => brand.Name)
+                .ToListAsync();
+            return Ok(brands);
+        }
 
     }
 }

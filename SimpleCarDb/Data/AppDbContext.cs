@@ -16,12 +16,12 @@ namespace SimpleCarDb.Data
         }
         //táblák:
         public DbSet<Brand> Brands => Set<Brand>();
-        public DbSet<Car> Cars { get; set; }
-        public DbSet<EngineDetail> EngineDetails { get; set; }
+        public DbSet<Car> Cars => Set<Car>();
+        public DbSet<EngineDetail> EngineDetails => Set<EngineDetail>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder); //feeding EF infót a DB-vel
 
             modelBuilder.Entity<Car>() //enginedetail osztály utólagos hozzáadása és a kapcsolatok meghatározása
                 .HasOne(c => c.EngineDetail)

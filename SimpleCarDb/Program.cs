@@ -4,12 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleCarDb.Data;
+using SimpleCarDb.Interfaces;
+using SimpleCarDb.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //ide jön az eslő kommentelt rész
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IEngineRepository, EngineRepository>(); //itt adom hozzá a repo-t az app-nak
 
 //swagger szűrő a megjelenítéshez:
 builder.Services.AddSwaggerGen(c =>
@@ -58,3 +61,8 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 */
+
+/*
+ * repository-ba menjen a query és a CUD
+ * 
+ */
