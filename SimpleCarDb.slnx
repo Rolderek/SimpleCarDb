@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="SimpleCarDb.Tests/SimpleCarDb.Tests.csproj" Id="495989a8-84bc-449c-929c-4d04433275a2" />
   <Project Path="SimpleCarDb/SimpleCarDb.csproj" />
 </Solution>

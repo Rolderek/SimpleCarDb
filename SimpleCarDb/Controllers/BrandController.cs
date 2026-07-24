@@ -26,9 +26,19 @@ namespace SimpleCarDb.Controllers
         [ProducesResponseType(typeof(List<Brand>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
-            var brands = await _context.Brands.Include(b => b.Cars).ToListAsync();
+            var brands = await _context.Brands.Include(b => b.Cars).ThenInclude(c => c.EngineDetail).ToListAsync();
             return Ok(brands);
         }
+        //erre a felső getre szép megoldás ez, ami streameli az adatokat folyamatosan amíg jönnek le aDB-ből
+        [HttpGet("getStreammel")]
+        [ProducesResponseType(typeof(List<Brand>), StatusCodes.Status200OK)]
+        public IAsyncEnumerable<Brand> GetAllStream()
+        {
+            return _context.Brands.Include(b => b.Cars)
+                .ThenInclude(c => c.EngineDetail)
+                .AsAsyncEnumerable();
+        } 
+
 
         [HttpGet("{id:int}")] //név aztán típus
         [ProducesResponseType(typeof(Brand), StatusCodes.Status200OK)]
